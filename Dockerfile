@@ -23,7 +23,7 @@ FROM base
 
 RUN apk update && \
     apk add --no-cache \
-    bash iproute2 openresolv
+    bash iproute2 openresolv ip6tables iptables
 
 COPY --from=builder /build /
 
