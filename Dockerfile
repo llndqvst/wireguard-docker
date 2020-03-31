@@ -4,7 +4,8 @@ FROM base as builder
 
 RUN apk update && \
     apk add --no-cache \
-    build-base linux-headers
+    build-base linux-headers \
+    iproute2 iptables ip6tables
 
 RUN mkdir -p /build
 
@@ -21,11 +22,12 @@ RUN make install
 
 FROM base
 
+COPY --from=builder /build /
+
 RUN apk update && \
     apk add --no-cache \
     bash iproute2 openresolv ip6tables iptables
 
-COPY --from=builder /build /
 
 COPY docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
 
