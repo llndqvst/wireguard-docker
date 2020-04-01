@@ -1,9 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 ### Further modified from https://github.com/cmulk/wireguard-docker
 ## The below is modified from https://github.com/activeeos/wireguard-docker
 
 # Find a Wireguard interface
+originalIP=`wget -qO- ifconfig.co`
 interfaces=`find /etc/wireguard -type f`
 if [[ -z $interfaces ]]; then
     echo "$(date): Interface not found in /etc/wireguard" >&2
@@ -28,7 +29,12 @@ finish () {
 
 trap finish SIGTERM SIGINT SIGQUIT
 
-exec "$@"
+exec "$@" &
 
-sleep infinity &
-wait $!
+while :
+do
+    wgIP=`wget -qO- ifconfig.co`
+    echo $wgIP
+    [[ $wgIP != $originalIP ]] || exit 1
+    sleep 350
+done
